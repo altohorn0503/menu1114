@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>號鳥食趣-長輩友善點餐系統</title>
+    <style>
+        /* 基礎樣式 - 放大字體，清晰閱讀 */
+        body {
+            font-family: "Microsoft JhengHei", sans-serif;
+            background-color: #f8f1e7;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            font-size: 24px; /* 全局字體放大 */
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: #8b4513;
+            text-align: center;
+        }
+
+        h1 { font-size: 40px; margin-bottom: 10px; }
+        h2 { font-size: 32px; border-bottom: 2px solid #8b4513; padding-bottom: 10px; }
+        h3 { font-size: 28px; text-align: left; }
+
+        .rules, .package {
+            background-color: #fff8f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #e0d0b0;
+        }
+
+        .item-group {
+            margin-bottom: 30px;
+        }
+
+        /* 勾選區樣式 */
+        .checkbox-label {
+            display: flex;
+            align-items: flex-start;
+            background: #fff;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border: 2px solid #eee;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        /* 勾選時的樣式改變 */
+        .checkbox-label:hover { background-color: #fdf2e9; }
+        input[type="checkbox"]:checked + span { color: #d35400; font-weight: bold; }
+        input[type="checkbox"]:checked + span.checkbox-tile {
+            border-color: #d35400;
+            background-color: #fdf2e9;
+        }
+
+        /* 讓選取框本身也放大 */
+        input[type="checkbox"] {
+            transform: scale(2);
+            margin-top: 10px;
+            margin-right: 20px;
+            cursor: pointer;
+        }
+
+        .item-details {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .item-title {
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .item-sub-title {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-top: -5px;
+        }
+
+        .item-price {
+            font-size: 26px;
+            color: #d35400;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        /* 備註樣式 */
+        .note-area {
+            width: 100%;
+            height: 100px;
+            font-size: 24px;
+            padding: 10px;
+            border-radius: 10px;
+            border: 2px solid #ccc;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        /* 匯出按鈕樣式 */
+        .export-btn {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            background-color: #27ae60;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            margin-top: 40px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .export-btn:hover { background-color: #219150; }
+
+        /* 示意圖片樣式 (可視需要縮小) */
+        .food-img {
+            max-width: 150px;
+            max-height: 100px;
+            border-radius: 8px;
+            margin-right: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>号鳥食趣</h1>
+    <h3>長輩友善點餐清單 - 勾選後匯出</h3>
+
+    <!-- 1. 基本規則區 -->
+    <div class="rules">
+        <h3>💡 用餐小提醒</h3>
+        <ul>
+            <li>用餐限時 <b>80分鐘</b>。</li>
+            <li>部分餐點含酒、蒜、辣，若有不吃請在最後備註。</li>
+        </ul>
+    </div>
+
+    <!-- 2. 多人精選套餐 (最推薦) -->
+    <div class="item-group">
+        <h2>🍱 多人精選套餐 (點此最划算)</h2>
+        <div class="note-area" style="background: #fff8f0; height: auto;">
+            <strong>※ 提示：</strong> 勾選套餐後，系統會鎖定其他單點選項，請只勾選「精選主餐」及「飲品」區的內容。
+        </div>
+        <br>
+        
+        <!-- 雙人套餐 -->
+        <label class="checkbox-label" onclick="handlePackageSelect('pair')">
+            <input type="checkbox" id="package-pair" class="package-check">
+            <div class="item-details">
+                <span class="item-title">雙人精選套餐</span>
+                <span class="item-sub-title">含：湯x2, 麵包x2, 開胃小點3選1, 飲品8選2, 精選主餐9選2</span>
+            </div>
+            <span class="item-price">$980</span>
+        </label>
+
+        <!-- 三人套餐 -->
+        <label class="checkbox-label" onclick="handlePackageSelect('trio')">
+            <input type="checkbox" id="package-trio" class="package-check">
+            <div class="item-details">
+                <span class="item-title">三人精選套餐</span>
+                <span class="item-sub-title">含：湯x3, 麵包x3, 開胃小點4選1, 飲品8選3, 精選主餐10選3</span>
+            </div>
+            <span class="item-price">$1380</span>
+        </label>
+
+        <!-- 四人套餐 -->
+        <label class="checkbox-label" onclick="handlePackageSelect('quad')">
+            <input type="checkbox" id="package-quad" class="package-check">
+            <div class="item-details">
+                <span class="item-title">四人精選套餐</span>
+                <span class="item-sub-title">含：湯x4, 麵包x4, 開胃小點4選1, 飲品8選4, 精選主餐11選4</span>
+            </div>
+            <span class="item-price">$1880</span>
+        </label>
+    </div>
+
+    <!-- 3. 精選主餐區 -->
+    <div class="item-group" id="main-courses">
+        <h2>🍝 精選主餐 (適用於套餐)</h2>
+        <p style="font-size:18px; color:red; text-align:center;">（※ 請依套餐人數選用，不可重複）</p>
+        
+        <!-- 主餐 1 (示意圖) -->
+        <label class="checkbox-label">
+            <input type="checkbox" class="main-course-check" value="1. 清炒蒜香蛤蜊圓麵">
+            <img src="https://via.placeholder.com/150x100?text=蛤蜊麵" class="food-img" alt="清炒蒜香蛤蜊圓麵">
+            <div class="item-details">
+                <span class="item-title">1. 清炒蒜香蛤蜊圓麵</span>
+                <span class="item-sub-title">Spaghetti with Clams</span>
+            </div>
+        </label>
+
+        <!-- 主餐 2 (示意圖) -->
+        <label class="checkbox-label">
+            <input type="checkbox" class="main-course-check" value="2. 香煎雞柳青醬圓麵">
+            <img src="https://via.placeholder.com/150x100?text=雞柳麵" class="food-img" alt="香煎雞柳青醬圓麵">
+            <div class="item-details">
+                <span class="item-title">2. 香煎雞柳青醬圓麵</span>
+                <span class="item-sub-title">Pesto Spaghetti with Chicken</span>
+            </div>
+        </label>
+
+        <!-- 主餐 5 (蛋奶素) -->
+        <label class="checkbox-label">
+            <input type="checkbox" class="main-course-check" value="5. 半熟玉子松露蕈菇扁麵 (蛋奶素)">
+            <img src="https://via.placeholder.com/150x100?text=蕈菇麵" class="food-img" alt="半熟玉子松露蕈菇扁麵">
+            <div class="item-details">
+                <span class="item-title">5. 半熟玉子松露蕈菇扁麵</span>
+                <span class="item-sub-title">Truffle Linguine (蛋奶素)</span>
+            </div>
+        </label>
+
+        <!-- 飲品 1 -->
+        <label class="checkbox-label">
+            <input type="checkbox" class="drink-check" value="號鳥嚴選紅茶">
+            <div class="item-details">
+                <span class="item-title">號鳥嚴選紅茶</span>
+            </div>
+        </label>
+        
+        <!-- 可依需要複製 label 區塊，自行增加所有品項 -->
+    </div>
+
+    <!-- 4. 備註與匯出 -->
+    <div class="item-group">
+        <h2>📝 備註 (姓名/桌號/特殊要求)</h2>
+        <textarea id="order-note" class="note-area" placeholder="例：王小明/A3桌，紅茶1杯不加蒜、不要辣"></textarea>
+    </div>
+
+    <!-- 匯出按鈕 -->
+    <button class="export-btn" onclick="exportOrder()">✅ 一鍵匯出訂單，方便主辦人</button>
+    <p style="font-size: 16px; color: #7f8c8d; text-align: center; margin-top: 10px;">點擊後會顯示訂單文字，請自行複製貼上。</p>
+
+</div>
+
+<script>
+    // 辨識套餐限制 (人數:限制數)
+    const packageLimits = {
+        'pair': 2,
+        'trio': 3,
+        'quad': 4
+    };
+    let currentLimit = 0;
+    let selectedCourses = 0;
+
+    // 處理套餐選取
+    function handlePackageSelect(packageType) {
+        // 先取消所有套餐勾選，確保只選一個
+        document.querySelectorAll('.package-check').forEach(p => p.checked = false);
+        document.getElementById(`package-${packageType}`).checked = true;
+
+        // 設定主餐限制數
+        currentLimit = packageLimits[packageType];
+        selectedCourses = 0;
+        
+        // 取消所有主餐勾選，並啟用
+        document.querySelectorAll('.main-course-check').forEach(c => {
+            c.checked = false;
+            c.disabled = false;
+        });
+        
+        // 可選：可以鎖定其他單點區，這裡先不實作，保持簡單
+    }
+
+    // 主餐勾選限制處理
+    document.getElementById('main-courses').addEventListener('change', function(e) {
+        if (e.target.classList.contains('main-course-check')) {
+            if (currentLimit === 0) {
+                alert("請先勾選想吃的『多人精選套餐』喔！系統會幫您計算數量。");
+                e.target.checked = false;
+                return;
+            }
+
+            if (e.target.checked) {
+                if (selectedCourses >= currentLimit) {
+                    alert(`這個套餐只能勾選 ${currentLimit} 個精選主餐喔！`);
+                    e.target.checked = false;
+                } else {
+                    selectedCourses++;
+                }
+            } else {
+                selectedCourses--;
+            }
+        }
+    });
+
+    // 匯出訂單文字
+    function exportOrder() {
+        let orderText = "------ 【号鳥食趣】訂單匯出 ------\n\n";
+
+        // 1. 套餐
+        let selectedPackage = "";
+        document.querySelectorAll('.package-check').forEach(p => {
+            if (p.checked) {
+                selectedPackage = p.closest('.checkbox-label').querySelector('.item-title').innerText;
+            }
+        });
+        if (selectedPackage) orderText += `選取套餐: ${selectedPackage}\n`;
+
+        // 2. 精選主餐
+        orderText += `精選主餐 (${selectedCourses}個):\n`;
+        document.querySelectorAll('.main-course-check:checked').forEach((c, index) => {
+            orderText += `  ${index+1}. ${c.value}\n`;
+        });
+
+        // 3. 飲品 (需自行增加完整checkbox)
+        let selectedDrinks = [];
+        document.querySelectorAll('.drink-check:checked').forEach(d => {
+            selectedDrinks.push(d.value);
+        });
+        if (selectedDrinks.length > 0) {
+            orderText += `選取飲品:\n`;
+            selectedDrinks.forEach((d, index) => orderText += `  ${index+1}. ${d}\n`);
+        }
+
+        // 4. 備註
+        let note = document.getElementById('order-note').value;
+        if (note) {
+            orderText += `\n備註:\n${note}\n`;
+        }
+
+        orderText += "\n----------------------------------";
+
+        // 顯示在一個彈出視窗中，方便複製
+        alert("代碼已匯出！請複製彈出視窗中的文字，直接貼到群組即可。\n\n" + orderText);
+    }
+</script>
+
+</body>
+</html>
